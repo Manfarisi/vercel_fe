@@ -26,11 +26,7 @@ import EditProdukKeluar from "./pages/ProdukKeluarEdit/EditProdukKeluar";
 import Display from "./pages/Kasir/Display";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Registrasi/Registrasi";
-import AbsenForm from "./pages/Absen/AbsenForm";
-import AbsenList from "./pages/DaftarAbsen/AbsenList";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-import RekapAbsen from "./pages/RekapAbsen/RekapAbsen";
-import DaftarKaryawan from "./pages/DaftarKaryawan/DaftarKaryawan";
 import DaftarPelanggan from "./pages/Pelanggan/Pelanggan";
 import ManajemenUser from "./pages/ManajemenUser/ManajemenUser";
 
@@ -87,38 +83,6 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <LaporanKeuangan url={url} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/absen"
-              element={
-                <ProtectedRoute>
-                  <AbsenForm url={url} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/daftarAbsen"
-              element={
-                <ProtectedRoute>
-                  <AbsenList url={url} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/rekapAbsen"
-              element={
-                <ProtectedRoute>
-                  <RekapAbsen url={url} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/daftarKaryawan"
-              element={
-                <ProtectedRoute>
-                  <DaftarKaryawan url={url} />
                 </ProtectedRoute>
               }
             />
