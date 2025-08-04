@@ -43,7 +43,7 @@ const DaftarPelanggan = ({ url }) => {
     if (result.isConfirmed) {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/pelanggan/hapus/${id}`,
+          `${url}/api/pelanggan/hapus/${id}`,
           {
             method: "DELETE",
           }
