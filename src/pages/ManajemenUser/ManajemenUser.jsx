@@ -49,7 +49,7 @@ function VerifikasiUser({ url }) {
 
     if (confirm.isConfirmed) {
       try {
-        const res = await axios.delete(`${url}/api/user/${id}`);
+        const res = await axios.delete(`${url}/api/user-delete/${id}`);
         if (res.data.success) {
           Swal.fire("Dihapus!", "User berhasil dihapus.", "success");
           getPendingUsers();
