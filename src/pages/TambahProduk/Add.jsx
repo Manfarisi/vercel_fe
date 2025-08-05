@@ -202,6 +202,7 @@ const Add = ({ url }) => {
               type="text"
               name="harga"
               placeholder="Contoh: Rp 30.000"
+              readOnly
               value={formatRupiah(data.harga)}
               onChange={(e) => {
                 const rawValue = e.target.value.replace(/\D/g, "");
