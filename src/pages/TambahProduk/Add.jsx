@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { assets } from "../../assets/assets";
 import axios from "axios";
+import { toast } from "react-toastify";
+import {
+  FaBoxOpen,
+  FaMoneyBillWave,
+  FaAlignLeft,
+  FaTags,
+  FaUtensils,
+  FaImage,
+  FaPlus,
+} from "react-icons/fa";
 import { BsFillLightningChargeFill } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-const Add = () => {
+const Add = ({ url }) => {
+  scrollTo;
   const [image, setImage] = useState(false);
+  const navigate = useNavigate();
   const [data, setData] = useState({
     namaProduk: "",
     keterangan: "",
@@ -16,47 +30,29 @@ const Add = () => {
     idProduk: "",
   });
 
-  const onChangeHandler = (e) => {
-    const { name, value } = e.target;
-    setData({ ...data, [name]: value });
+  const onChangeHandler = (event) => {
+    const { name, value } = event.target;
+    setData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Generate otomatis ID Produk
-  useEffect(() => {
-    const inisial = data.namaProduk.replace(/\s+/g, "").toUpperCase().slice(0, 3);
-    const angka = data.kodeAngka.toString().padStart(3, "0");
-    if (data.namaProduk && data.kodeAngka) {
-      setData((prev) => ({
-        ...prev,
-        idProduk: `PJ-${inisial}-${angka}`,
-      }));
-    }
-  }, [data.namaProduk, data.kodeAngka]);
-
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-    formData.append("image", image);
-
+  const onSubmitHandler = async (event) => {
+    event.preventDefault();
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/food`,
-        formData
-      );
+      const formData = new FormData();
+      formData.append("namaProduk", data.namaProduk);
+      formData.append("keterangan", data.keterangan);
+      formData.append("harga", Number(data.harga));
+      formData.append("kategori", data.kategori);
+      formData.append("jumlah", Number(data.jumlah));
+      formData.append("hpp", Number(data.hpp));
+      formData.append("kodeAngka", data.kodeAngka);
+      formData.append("idProduk", data.idProduk);
+
+      formData.append("image", image);
+
+      const response = await axios.post(`${url}/api/food/add, formData`);
 
       if (response.data.success) {
-        Swal.fire({
-          title: "Sukses!",
-          text: response.data.message,
-          icon: "success",
-          timer: 2000,
-        });
-
-        // Reset state
         setData({
           namaProduk: "",
           keterangan: "",
@@ -64,179 +60,253 @@ const Add = () => {
           harga: "",
           kategori: "",
           hpp: "",
-          kodeAngka: "",
-          idProduk: "",
         });
         setImage(false);
+
+        Swal.fire({
+          title: "Berhasil!",
+          text: "Produk berhasil ditambahkan. ID Produk: ${response.data.idProduk}",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => navigate("/list"));
+      } else {
+        Swal.fire({
+          title: "Gagal!",
+          text: response.data.message || "Gagal menambahkan produk.",
+          icon: "error",
+          confirmButtonText: "Tutup",
+        });
       }
-    } catch (error) {
+    } catch (err) {
       Swal.fire({
-        title: "Gagal!",
-        text: error.response?.data?.message || "Terjadi kesalahan.",
+        title: "Error!",
+        text: "Terjadi kesalahan saat mengirim data.",
         icon: "error",
+        confirmButtonText: "Tutup",
       });
     }
   };
 
+  const formatRupiah = (angka) => {
+    if (!angka) return "";
+    const numberString = angka.toString().replace(/[^,\d]/g, "");
+    const split = numberString.split(",");
+    const sisa = split[0].length % 3;
+    let rupiah = split[0].substr(0, sisa);
+    const ribuan = split[0].substr(sisa).match(/\d{3}/g);
+    if (ribuan) {
+      const separator = sisa ? "." : "";
+      rupiah += separator + ribuan.join(".");
+    }
+    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+    return "Rp " + rupiah;
+  };
+
   return (
-    <form onSubmit={onSubmitHandler} className="space-y-4 max-w-xl mx-auto">
-      {/* Nama Produk */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Nama Produk
-        </label>
-        <input
-          type="text"
-          name="namaProduk"
-          value={data.namaProduk}
-          onChange={onChangeHandler}
-          placeholder="Masukkan Nama Produk"
-          className="w-full p-2 border rounded-md"
-          required
-        />
-      </div>
+    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+        <FaUtensils className="text-orange-500" /> Tambah Produk Baru
+      </h2>
 
-      {/* Keterangan */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Keterangan
-        </label>
-        <textarea
-          name="keterangan"
-          value={data.keterangan}
-          onChange={onChangeHandler}
-          placeholder="Masukkan Keterangan"
-          className="w-full p-2 border rounded-md"
-          required
-        />
-      </div>
+      <form
+        onSubmit={onSubmitHandler}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        {/* KIRI */}
+        <div className="space-y-4">
+          {/* Nama Produk */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              <FaBoxOpen className="inline mr-2 text-green-500" />
+              Nama Produk
+            </label>
+            <input
+              type="text"
+              name="namaProduk"
+              value={data.namaProduk}
+              onChange={onChangeHandler}
+              placeholder="Masukkan nama produk"
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+              required
+            />
+          </div>
 
-      {/* Kode Angka */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Kode Angka
-        </label>
-        <input
-          type="number"
-          name="kodeAngka"
-          value={data.kodeAngka}
-          onChange={onChangeHandler}
-          placeholder="Contoh: 1"
-          className="w-full p-2 border rounded-md"
-          required
-        />
-      </div>
+          {/* Keterangan */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              <FaAlignLeft className="inline mr-2 text-gray-500" />
+              Deskripsi Produk
+            </label>
+            <textarea
+              name="keterangan"
+              rows="4"
+              value={data.keterangan}
+              onChange={onChangeHandler}
+              placeholder="Tulis deskripsi produk..."
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            ></textarea>
+          </div>
 
-      {/* ID Produk */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          ID Produk
-        </label>
-        <input
-          type="text"
-          name="idProduk"
-          value={data.idProduk}
-          onChange={onChangeHandler}
-          placeholder="Contoh: PJ-AYM-001"
-          className="w-full p-2 border rounded-md"
-          required
-        />
-      </div>
+          {/* Jumlah */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              <BsFillLightningChargeFill className="inline mr-2 text-yellow-500" />
+              Jumlah
+            </label>
+            {/* Kode Angka */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                Kode Angka
+              </label>
+              <input
+                type="number"
+                name="kodeAngka"
+                value={data.kodeAngka}
+                onChange={onChangeHandler}
+                placeholder="Contoh: 1"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                required
+              />
+            </div>
 
-      {/* Jumlah */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          <BsFillLightningChargeFill className="inline mr-2 text-yellow-500" />
-          Jumlah
-        </label>
-        <input
-          type="number"
-          name="jumlah"
-          value={data.jumlah}
-          onChange={onChangeHandler}
-          placeholder="Masukkan Jumlah"
-          className="w-full p-2 border rounded-md"
-          required
-        />
-      </div>
+            {/* ID Produk */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                ID Produk
+              </label>
+              <input
+                type="text"
+                name="idProduk"
+                value={data.idProduk}
+                onChange={onChangeHandler}
+                placeholder="Contoh: PJ-AYM-001"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                required
+              />
+            </div>
+            <input
+              type="number"
+              name="jumlah"
+              value={data.jumlah}
+              onChange={onChangeHandler}
+              placeholder="Masukkan Jumlah"
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              required
+            />
+          </div>
+        </div>
 
-      {/* HPP */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Harga Modal (HPP)
-        </label>
-        <input
-          type="number"
-          name="hpp"
-          value={data.hpp}
-          onChange={onChangeHandler}
-          placeholder="Masukkan HPP"
-          className="w-full p-2 border rounded-md"
-          required
-        />
-      </div>
+        {/* KANAN */}
+        <div className="space-y-4">
+          {/* HPP */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              <FaMoneyBillWave className="inline mr-2 text-indigo-500" />
+              Harga Pokok Produksi
+            </label>
+            <input
+              type="text"
+              name="hpp"
+              placeholder="Contoh: Rp 20.000"
+              value={formatRupiah(data.hpp)}
+              onChange={(e) => {
+                const rawValue = e.target.value.replace(/\D/g, "");
+                const newHpp = rawValue;
 
-      {/* Harga (Readonly) */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Harga Jual (Readonly)
-        </label>
-        <input
-          type="number"
-          name="harga"
-          value={data.hpp ? Math.round(Number(data.hpp) * 1.2) : ""}
-          readOnly
-          placeholder="Akan dihitung otomatis dari HPP x 1.2"
-          className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-        />
-      </div>
+                // Hitung harga = hpp + 20%
+                const newHarga = Math.round(newHpp * 1.2);
 
-      {/* Kategori */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Kategori
-        </label>
-        <select
-          name="kategori"
-          value={data.kategori}
-          onChange={onChangeHandler}
-          className="w-full p-2 border rounded-md"
-          required
-        >
-          <option value="">Pilih Kategori</option>
-          <option value="Hampers">Hampers</option>
-          <option value="Frozen">Frozen</option>
-          <option value="Paket Mini Frozen">Paket Mini Frozen</option>
-          <option value="Paket Matang">Paket Matang</option>
-          <option value="Hampers Neela Klappertart">Hampers Neela Klappertart</option>
-        </select>
-      </div>
+                setData((prevData) => ({
+                  ...prevData,
+                  hpp: newHpp,
+                  harga: newHarga.toString(), // tetap disimpan sebagai string untuk formatRupiah
+                }));
+              }}
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              required
+            />
+          </div>
 
-      {/* Upload Gambar */}
-      <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Gambar Produk
-        </label>
-        <input
-          type="file"
-          name="image"
-          onChange={(e) => setImage(e.target.files[0])}
-          accept="image/*"
-          className="w-full"
-          required
-        />
-      </div>
+          {/* Harga Jual */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              <FaMoneyBillWave className="inline mr-2 text-red-500" />
+              Harga Jual
+            </label>
+            <input
+              type="text"
+              name="harga"
+              placeholder="Contoh: Rp 30.000"
+              readOnly
+              value={formatRupiah(data.harga)}
+              onChange={(e) => {
+                const rawValue = e.target.value.replace(/\D/g, "");
+                setData((prevData) => ({ ...prevData, harga: rawValue }));
+              }}
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
+              required
+            />
+          </div>
 
-      {/* Tombol Submit */}
-      <div className="text-right">
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          Simpan Produk
-        </button>
-      </div>
-    </form>
+          {/* Kategori */}
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">
+              <FaTags className="inline mr-2 text-purple-500" />
+              Kategori Produk
+            </label>
+            <select
+              name="kategori"
+              value={data.kategori}
+              onChange={onChangeHandler}
+              className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring focus:ring-purple-300"
+              required
+            >
+              <option value="">-- Pilih Jenis --</option>
+              <option value="Hampers">Hampers</option>
+              <option value="Frozen">Frozen</option>
+              <option value="Paket Mini Frozen">Paket Mini Frozen</option>
+              <option value="Paket Matang">Paket Matang</option>
+              <option value="Hampers Neela Klappertart">
+                Hampers Neela Klappertart
+              </option>
+            </select>
+          </div>
+
+          {/* Upload Gambar */}
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              <FaImage className="inline mr-2 text-blue-500" />
+              Upload Gambar
+            </label>
+            <label htmlFor="image" className="block w-full cursor-pointer">
+              <img
+                src={image ? URL.createObjectURL(image) : assets.upload_area}
+                alt="Preview"
+                className="w-full max-h-48 object-contain rounded border p-2 bg-gray-50"
+              />
+            </label>
+            <input
+              type="file"
+              id="image"
+              onChange={(e) => setImage(e.target.files[0])}
+              hidden
+              required
+            />
+          </div>
+        </div>
+
+        {/* Tombol Submit - Di bawah tengah */}
+        <div className="md:col-span-2 text-center mt-6">
+          <button
+            type="submit"
+            className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
+          >
+            <FaPlus /> Tambah Produk
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 
