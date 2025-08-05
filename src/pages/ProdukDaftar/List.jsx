@@ -156,8 +156,7 @@ const List = ({ url }) => {
                 {[
                   "Gambar",
                   "Nama",
-                  "ID Produk",
-                  "Kode Angka",
+                  "Kode Produk",
                   "Kategori",
                   "Deskripsi",
                   "Jumlah",
@@ -190,11 +189,7 @@ const List = ({ url }) => {
                     </td>
                     {/* ➕ Tambahkan ID Produk */}
                     <td className="px-6 py-4 text-sm text-gray-700 font-mono">
-                      {item.idProduk || "-"}
-                    </td>
-                    {/* ➕ Tambahkan Kode Angka */}
-                    <td className="px-6 py-4 text-sm text-gray-700 font-mono">
-                      {item.kodeAngka || "-"}
+                      {item.kodeProduk || "-"}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {item.kategori}
