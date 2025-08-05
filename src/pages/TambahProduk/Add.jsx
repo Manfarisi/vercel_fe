@@ -154,37 +154,6 @@ const Add = ({ url }) => {
               <BsFillLightningChargeFill className="inline mr-2 text-yellow-500" />
               Jumlah
             </label>
-            {/* Kode Angka */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                Kode Angka
-              </label>
-              <input
-                type="number"
-                name="kodeAngka"
-                value={data.kodeAngka}
-                onChange={onChangeHandler}
-                placeholder="Contoh: 1"
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-                required
-              />
-            </div>
-
-            {/* ID Produk */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                ID Produk
-              </label>
-              <input
-                type="text"
-                name="idProduk"
-                value={data.idProduk}
-                onChange={onChangeHandler}
-                placeholder="Contoh: PJ-AYM-001"
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-                required
-              />
-            </div>
             <input
               type="number"
               name="jumlah"
@@ -195,6 +164,38 @@ const Add = ({ url }) => {
               required
             />
           </div>
+        </div>
+
+        {/* Kode Angka */}
+        <div>
+          <label className="block mb-1 text-sm font-medium text-gray-700">
+            Kode Angka
+          </label>
+          <input
+            type="number"
+            name="kodeAngka"
+            value={data.kodeAngka}
+            onChange={onChangeHandler}
+            placeholder="Contoh: 1"
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+            required
+          />
+        </div>
+
+        {/* ID Produk */}
+        <div>
+          <label className="block mb-1 text-sm font-medium text-gray-700">
+            ID Produk
+          </label>
+          <input
+            type="text"
+            name="idProduk"
+            value={data.idProduk}
+            onChange={onChangeHandler}
+            placeholder="Contoh: PJ-AYM-001"
+            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+            required
+          />
         </div>
 
         {/* KANAN */}
