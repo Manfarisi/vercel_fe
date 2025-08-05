@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { BsFillLightningChargeFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const Add = ({ url }) => {
   scrollTo;
@@ -60,7 +60,7 @@ const Add = ({ url }) => {
 
         Swal.fire({
           title: "Berhasil!",
-          text: "Produk berhasil ditambahkan.",
+          text: `Produk berhasil ditambahkan. ID Produk: ${response.data.idProduk}`,
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => navigate("/list"));
@@ -169,28 +169,27 @@ const Add = ({ url }) => {
               <FaMoneyBillWave className="inline mr-2 text-indigo-500" />
               Harga Pokok Produksi
             </label>
-<input
-  type="text"
-  name="hpp"
-  placeholder="Contoh: Rp 20.000"
-  value={formatRupiah(data.hpp)}
-  onChange={(e) => {
-    const rawValue = e.target.value.replace(/\D/g, "");
-    const newHpp = rawValue;
+            <input
+              type="text"
+              name="hpp"
+              placeholder="Contoh: Rp 20.000"
+              value={formatRupiah(data.hpp)}
+              onChange={(e) => {
+                const rawValue = e.target.value.replace(/\D/g, "");
+                const newHpp = rawValue;
 
-    // Hitung harga = hpp + 20%
-    const newHarga = Math.round(newHpp * 1.2);
+                // Hitung harga = hpp + 20%
+                const newHarga = Math.round(newHpp * 1.2);
 
-    setData((prevData) => ({
-      ...prevData,
-      hpp: newHpp,
-      harga: newHarga.toString(), // tetap disimpan sebagai string untuk formatRupiah
-    }));
-  }}
-  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-  required
-/>
-
+                setData((prevData) => ({
+                  ...prevData,
+                  hpp: newHpp,
+                  harga: newHarga.toString(), // tetap disimpan sebagai string untuk formatRupiah
+                }));
+              }}
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              required
+            />
           </div>
 
           {/* Harga Jual */}

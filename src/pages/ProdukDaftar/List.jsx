@@ -11,7 +11,6 @@ import {
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 
-
 const List = ({ url }) => {
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
@@ -39,48 +38,46 @@ const List = ({ url }) => {
     navigate(`/list/edit/${id}`);
   };
 
-const removeFood = async (id) => {
-  const result = await Swal.fire({
-    title: "Yakin ingin menghapus?",
-    text: "Data makanan yang dihapus tidak bisa dikembalikan!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Ya, hapus!",
-    cancelButtonText: "Batal",
-  });
+  const removeFood = async (id) => {
+    const result = await Swal.fire({
+      title: "Yakin ingin menghapus?",
+      text: "Data makanan yang dihapus tidak bisa dikembalikan!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
 
-  if (result.isConfirmed) {
-    try {
-      const response = await axios.post(`${url}/api/food/remove`, { id });
-      if (response.data.success) {
-        Swal.fire("Berhasil!", response.data.message, "success");
-        fetchList();
-      } else {
-        Swal.fire("Gagal!", "Gagal menghapus data!", "error");
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.post(`${url}/api/food/remove`, { id });
+        if (response.data.success) {
+          Swal.fire("Berhasil!", response.data.message, "success");
+          fetchList();
+        } else {
+          Swal.fire("Gagal!", "Gagal menghapus data!", "error");
+        }
+      } catch (error) {
+        Swal.fire("Error!", "Terjadi kesalahan saat menghapus data!", "error");
       }
-    } catch (error) {
-      Swal.fire("Error!", "Terjadi kesalahan saat menghapus data!", "error");
     }
-  }
-};
-
+  };
 
   useEffect(() => {
     fetchList();
   }, []);
 
-const filteredList = list.filter((item) => {
-  const matchSearch = item.namaProduk
-    ?.toLowerCase()
-    .includes(search.toLowerCase());
-  const matchCategory = selectedCategory
-    ? item.kategori === selectedCategory
-    : true;
-  return matchSearch && matchCategory;
-});
-
+  const filteredList = list.filter((item) => {
+    const matchSearch = item.namaProduk
+      ?.toLowerCase()
+      .includes(search.toLowerCase());
+    const matchCategory = selectedCategory
+      ? item.kategori === selectedCategory
+      : true;
+    return matchSearch && matchCategory;
+  });
 
   const lowStockItems = filteredList.filter((item) => item.jumlah < 10);
 
@@ -159,6 +156,8 @@ const filteredList = list.filter((item) => {
                 {[
                   "Gambar",
                   "Nama",
+                  "ID Produk",
+                  "Kode Angka",
                   "Kategori",
                   "Deskripsi",
                   "Jumlah",
@@ -188,6 +187,14 @@ const filteredList = list.filter((item) => {
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {item.namaProduk}
+                    </td>
+                    {/* ➕ Tambahkan ID Produk */}
+                    <td className="px-6 py-4 text-sm text-gray-700 font-mono">
+                      {item.idProduk || "-"}
+                    </td>
+                    {/* ➕ Tambahkan Kode Angka */}
+                    <td className="px-6 py-4 text-sm text-gray-700 font-mono">
+                      {item.kodeAngka || "-"}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {item.kategori}
