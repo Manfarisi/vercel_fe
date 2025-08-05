@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { assets } from "../../assets/assets";
 import axios from "axios";
-import { toast } from "react-toastify";
 import {
   FaBoxOpen,
   FaMoneyBillWave,
@@ -72,6 +71,8 @@ const Add = ({ url }) => {
           harga: "",
           kategori: "",
           hpp: "",
+          kodeAngka: "",
+          idProduk: "",
         });
         setImage(false);
 
