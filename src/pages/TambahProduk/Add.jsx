@@ -44,7 +44,7 @@ const Add = ({ url }) => {
       formData.append("kategori", data.kategori);
       formData.append("jumlah", Number(data.jumlah));
       formData.append("hpp", Number(data.hpp));
-      formData.append("kodeProduk", data.idProduk);
+      formData.append("kodeProduk", data.kodeProduk);
 
       formData.append("image", image);
 
