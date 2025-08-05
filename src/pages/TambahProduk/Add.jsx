@@ -34,17 +34,6 @@ const Add = ({ url }) => {
     setData({ ...data, [name]: value });
   };
 
-  // Generate otomatis ID Produk
-  useEffect(() => {
-    const inisial = data.namaProduk.replace(/\s+/g, "").toUpperCase().slice(0, 3);
-    const angka = data.kodeAngka.toString().padStart(3, "0");
-    if (data.namaProduk && data.kodeAngka) {
-      setData((prev) => ({
-        ...prev,
-        idProduk: `PJ-${inisial}-${angka}`,
-      }));
-    }
-  }, [data.namaProduk, data.kodeAngka]);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
