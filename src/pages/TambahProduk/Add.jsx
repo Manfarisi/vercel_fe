@@ -30,10 +30,22 @@ const Add = ({ url }) => {
     idProduk: "",
   });
 
-  const onChangeHandler = (event) => {
-    const { name, value } = event.target;
-    setData((prev) => ({ ...prev, [name]: value }));
+  const onChangeHandler = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
   };
+
+  // Generate otomatis ID Produk
+  useEffect(() => {
+    const inisial = data.namaProduk.replace(/\s+/g, "").toUpperCase().slice(0, 3);
+    const angka = data.kodeAngka.toString().padStart(3, "0");
+    if (data.namaProduk && data.kodeAngka) {
+      setData((prev) => ({
+        ...prev,
+        idProduk: `PJ-${inisial}-${angka}`,
+      }));
+    }
+  }, [data.namaProduk, data.kodeAngka]);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -49,21 +61,6 @@ const Add = ({ url }) => {
       formData.append("idProduk", data.idProduk);
 
       formData.append("image", image);
-
-      // Generate otomatis ID Produk
-      useEffect(() => {
-        const inisial = data.namaProduk
-          .replace(/\s+/g, "")
-          .toUpperCase()
-          .slice(0, 3);
-        const angka = data.kodeAngka.toString().padStart(3, "0");
-        if (data.namaProduk && data.kodeAngka) {
-          setData((prev) => ({
-            ...prev,
-            idProduk: `PJ-${inisial}-${angka}`,
-          }));
-        }
-      }, [data.namaProduk, data.kodeAngka]);
 
       const response = await axios.post(`${url}/api/food/add, formData`);
 
