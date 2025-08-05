@@ -45,7 +45,6 @@ const Add = ({ url }) => {
       formData.append("kategori", data.kategori);
       formData.append("jumlah", Number(data.jumlah));
       formData.append("hpp", Number(data.hpp));
-      formData.append("kodeAngka", data.kodeAngka);
       formData.append("idProduk", data.idProduk);
 
       formData.append("image", image);
@@ -60,7 +59,6 @@ const Add = ({ url }) => {
           harga: "",
           kategori: "",
           hpp: "",
-          kodeAngka: "",
           idProduk: "",
         });
         setImage(false);
@@ -166,22 +164,6 @@ const Add = ({ url }) => {
               required
             />
           </div>
-        </div>
-
-        {/* Kode Angka */}
-        <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">
-            Kode Angka
-          </label>
-          <input
-            type="number"
-            name="kodeAngka"
-            value={data.kodeAngka}
-            onChange={onChangeHandler}
-            placeholder="Contoh: 1"
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-            required
-          />
         </div>
 
         {/* ID Produk */}
