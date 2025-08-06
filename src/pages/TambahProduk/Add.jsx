@@ -58,13 +58,13 @@ const Add = ({ url }) => {
           harga: "",
           kategori: "",
           hpp: "",
-          idProduk: "",
+          kodeProduk: "",
         });
         setImage(false);
 
         Swal.fire({
           title: "Berhasil!",
-          text: "Produk berhasil ditambahkan. ID Produk: ${response.data.idProduk}",
+          text: "Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}",
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => navigate("/list"));
@@ -172,8 +172,8 @@ const Add = ({ url }) => {
           </label>
           <input
             type="text"
-            name="idProduk"
-            value={data.idProduk}
+            name="kodeProduk"
+            value={data.kodeProduk}
             onChange={onChangeHandler}
             placeholder="Contoh: PJ-AYM-001"
             className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
