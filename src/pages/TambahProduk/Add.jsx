@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { assets } from "../../assets/assets";
 import axios from "axios";
 import {
@@ -15,9 +15,9 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const Add = ({ url }) => {
-  scrollTo;
-  const [image, setImage] = useState(false);
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
+
   const [data, setData] = useState({
     namaProduk: "",
     keterangan: "",
@@ -25,7 +25,6 @@ const Add = ({ url }) => {
     harga: "",
     kategori: "",
     hpp: "",
-    // kodeProduk: "",
   });
 
   const onChangeHandler = (e) => {
@@ -33,9 +32,9 @@ const Add = ({ url }) => {
     setData({ ...data, [name]: value });
   };
 
-
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+
     try {
       const formData = new FormData();
       formData.append("namaProduk", data.namaProduk);
@@ -44,12 +43,25 @@ const Add = ({ url }) => {
       formData.append("kategori", data.kategori);
       formData.append("jumlah", Number(data.jumlah));
       formData.append("hpp", Number(data.hpp));
-      // formData.append("kodeProduk", data.kodeProduk);
-      formData.append("image", image);
+      if (image) formData.append("image", image);
+
+      // Debugging
+      console.log("FormData yang dikirim:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
       const response = await axios.post(`${url}/api/food/add`, formData);
 
       if (response.data.success) {
+        Swal.fire({
+          title: "Berhasil!",
+          text: `Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}`,
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => navigate("/list"));
+
+        // Reset form
         setData({
           namaProduk: "",
           keterangan: "",
@@ -57,16 +69,8 @@ const Add = ({ url }) => {
           harga: "",
           kategori: "",
           hpp: "",
-          // kodeProduk: "",
         });
-        setImage(false);
-
-        Swal.fire({
-          title: "Berhasil!",
-          text: "Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}",
-          icon: "success",
-          confirmButtonText: "OK",
-        }).then(() => navigate("/list"));
+        setImage(null);
       } else {
         Swal.fire({
           title: "Gagal!",
@@ -115,8 +119,7 @@ const Add = ({ url }) => {
           {/* Nama Produk */}
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-700">
-              <FaBoxOpen className="inline mr-2 text-green-500" />
-              Nama Produk
+              <FaBoxOpen className="inline mr-2 text-green-500" /> Nama Produk
             </label>
             <input
               type="text"
@@ -132,8 +135,8 @@ const Add = ({ url }) => {
           {/* Keterangan */}
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-700">
-              <FaAlignLeft className="inline mr-2 text-gray-500" />
-              Deskripsi Produk
+              <FaAlignLeft className="inline mr-2 text-gray-500" /> Deskripsi
+              Produk
             </label>
             <textarea
               name="keterangan"
@@ -149,7 +152,7 @@ const Add = ({ url }) => {
           {/* Jumlah */}
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-700">
-              <BsFillLightningChargeFill className="inline mr-2 text-yellow-500" />
+              <BsFillLightningChargeFill className="inline mr-2 text-yellow-500" />{" "}
               Jumlah
             </label>
             <input
@@ -157,36 +160,20 @@ const Add = ({ url }) => {
               name="jumlah"
               value={data.jumlah}
               onChange={onChangeHandler}
-              placeholder="Masukkan Jumlah"
+              placeholder="Masukkan jumlah"
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
             />
           </div>
         </div>
 
-        {/* ID Produk */}
-        {/* <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">
-            ID Produk
-          </label>
-          <input
-            type="text"
-            name="kodeProduk"
-            value={data.kodeProduk}
-            onChange={onChangeHandler}
-            placeholder="Contoh: PJ-AYM-001"
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-            required
-          />
-        </div> */}
-
         {/* KANAN */}
         <div className="space-y-4">
           {/* HPP */}
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-700">
-              <FaMoneyBillWave className="inline mr-2 text-indigo-500" />
-              Harga Pokok Produksi
+              <FaMoneyBillWave className="inline mr-2 text-indigo-500" /> Harga
+              Pokok Produksi
             </label>
             <input
               type="text"
@@ -196,14 +183,11 @@ const Add = ({ url }) => {
               onChange={(e) => {
                 const rawValue = e.target.value.replace(/\D/g, "");
                 const newHpp = rawValue;
-
-                // Hitung harga = hpp + 20%
                 const newHarga = Math.round(newHpp * 1.2);
-
                 setData((prevData) => ({
                   ...prevData,
                   hpp: newHpp,
-                  harga: newHarga.toString(), // tetap disimpan sebagai string untuk formatRupiah
+                  harga: newHarga.toString(),
                 }));
               }}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -214,19 +198,14 @@ const Add = ({ url }) => {
           {/* Harga Jual */}
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-700">
-              <FaMoneyBillWave className="inline mr-2 text-red-500" />
-              Harga Jual
+              <FaMoneyBillWave className="inline mr-2 text-red-500" /> Harga
+              Jual
             </label>
             <input
               type="text"
               name="harga"
-              placeholder="Contoh: Rp 30.000"
               readOnly
               value={formatRupiah(data.harga)}
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, "");
-                setData((prevData) => ({ ...prevData, harga: rawValue }));
-              }}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
               required
             />
@@ -235,8 +214,7 @@ const Add = ({ url }) => {
           {/* Kategori */}
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              <FaTags className="inline mr-2 text-purple-500" />
-              Kategori Produk
+              <FaTags className="inline mr-2 text-purple-500" /> Kategori Produk
             </label>
             <select
               name="kategori"
@@ -259,8 +237,7 @@ const Add = ({ url }) => {
           {/* Upload Gambar */}
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-700">
-              <FaImage className="inline mr-2 text-blue-500" />
-              Upload Gambar
+              <FaImage className="inline mr-2 text-blue-500" /> Upload Gambar
             </label>
             <label htmlFor="image" className="block w-full cursor-pointer">
               <img
@@ -279,7 +256,7 @@ const Add = ({ url }) => {
           </div>
         </div>
 
-        {/* Tombol Submit - Di bawah tengah */}
+        {/* Tombol Submit */}
         <div className="md:col-span-2 text-center mt-6">
           <button
             type="submit"
