@@ -48,6 +48,11 @@ const onSubmitHandler = async (event) => {
       formData.append("image", image);
     }
 
+      // Kalau mau kirim kode manual → tambahkan ini
+  if (kodeProduk) {
+    formData.append("kodeProduk", kodeProduk);
+  }
+
     // Debugging: cek isi FormData
     console.log("=== DATA YANG DIKIRIM ===");
     for (let pair of formData.entries()) {
