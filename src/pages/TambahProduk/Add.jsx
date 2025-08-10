@@ -32,62 +32,75 @@ const Add = ({ url }) => {
     setData({ ...data, [name]: value });
   };
 
-  const onSubmitHandler = async (event) => {
-    event.preventDefault();
+const onSubmitHandler = async (event) => {
+  event.preventDefault();
 
-    try {
-      const formData = new FormData();
-      formData.append("namaProduk", data.namaProduk);
-      formData.append("keterangan", data.keterangan);
-      formData.append("harga", Number(data.harga));
-      formData.append("kategori", data.kategori);
-      formData.append("jumlah", Number(data.jumlah));
-      formData.append("hpp", Number(data.hpp));
-      if (image) formData.append("image", image);
+  try {
+    const formData = new FormData();
+    formData.append("namaProduk", data.namaProduk);
+    formData.append("keterangan", data.keterangan);
+    formData.append("harga", Number(data.harga));
+    formData.append("kategori", data.kategori);
+    formData.append("jumlah", Number(data.jumlah));
+    formData.append("hpp", Number(data.hpp));
 
-      // Debugging
-      console.log("FormData yang dikirim:");
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
+    if (image) {
+      formData.append("image", image);
+    }
+
+    // Debugging: cek isi FormData
+    console.log("=== DATA YANG DIKIRIM ===");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
+    const response = await axios.post(
+      `${url}/api/food/add`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
+    );
 
-      const response = await axios.post(`${url}/api/food/add`, formData);
-
-      if (response.data.success) {
-        Swal.fire({
-          title: "Berhasil!",
-          text: `Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}`,
-          icon: "success",
-          confirmButtonText: "OK",
-        }).then(() => navigate("/list"));
-
-        // Reset form
-        setData({
-          namaProduk: "",
-          keterangan: "",
-          jumlah: "",
-          harga: "",
-          kategori: "",
-          hpp: "",
-        });
-        setImage(null);
-      } else {
-        Swal.fire({
-          title: "Gagal!",
-          text: response.data.message || "Gagal menambahkan produk.",
-          icon: "error",
-          confirmButtonText: "Tutup",
-        });
-      }
-    } catch (err) {
+    if (response.data.success) {
       Swal.fire({
-        title: "Error!",
-        text: "Terjadi kesalahan saat mengirim data.",
+        title: "Berhasil!",
+        text: `Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}`,
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => navigate("/list"));
+
+      // Reset form
+      setData({
+        namaProduk: "",
+        keterangan: "",
+        jumlah: "",
+        harga: "",
+        kategori: "",
+        hpp: "",
+      });
+      setImage(null);
+    } else {
+      Swal.fire({
+        title: "Gagal!",
+        text: response.data.message || "Gagal menambahkan produk.",
         icon: "error",
         confirmButtonText: "Tutup",
       });
     }
-  };
+  } catch (err) {
+    console.error("Error saat kirim data:", err);
+    Swal.fire({
+      title: "Error!",
+      text: "Terjadi kesalahan saat mengirim data.",
+      icon: "error",
+      confirmButtonText: "Tutup",
+    });
+  }
+};
+
 
   const formatRupiah = (angka) => {
     if (!angka) return "";
