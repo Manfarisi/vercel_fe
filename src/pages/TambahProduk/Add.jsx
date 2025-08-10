@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { assets } from "../../assets/assets";
 import axios from "axios";
 import {
@@ -26,6 +26,23 @@ const Add = ({ url }) => {
     kategori: "",
     hpp: "",
   });
+
+  const [kodeProduk, setKodeProduk] = useState("");
+
+
+  const generateKodeProduk = (nama, kategori) => {
+  if (!nama || !kategori) return "";
+  const prefix = "PJ";
+  const singkatan = nama.substring(0, 3).toUpperCase();
+  const randomNum = String(Math.floor(Math.random() * 1000)).padStart(3, "0");
+  return `${prefix}-${singkatan}-${randomNum}`;
+};
+
+useEffect(() => {
+  if (data.namaProduk && data.kategori) {
+    setKodeProduk(generateKodeProduk(data.namaProduk, data.kategori));
+  }
+}, [data.namaProduk, data.kategori]);
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
