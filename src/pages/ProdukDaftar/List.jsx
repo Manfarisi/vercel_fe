@@ -102,7 +102,7 @@ const List = ({ url }) => {
             onClick={() => navigate("/add")}
             className="mt-4 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
           >
-            <FaPlus className="mr-2" /> Tambah Makanan
+            <FaPlus className="mr-2" /> Tambah Produk
           </button>
         </div>
 
@@ -248,7 +248,7 @@ const List = ({ url }) => {
                         onClick={() => navigate("/add")}
                         className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
                       >
-                        <FaPlus className="mr-2" /> Tambah Makanan
+                        <FaPlus className="mr-2" /> Tambah Produk
                       </button>
                     </div>
                   </td>

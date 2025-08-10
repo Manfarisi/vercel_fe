@@ -25,7 +25,7 @@ const Add = ({ url }) => {
     harga: "",
     kategori: "",
     hpp: "",
-    kodeProduk: "",
+    // kodeProduk: "",
   });
 
   const onChangeHandler = (e) => {
@@ -44,8 +44,7 @@ const Add = ({ url }) => {
       formData.append("kategori", data.kategori);
       formData.append("jumlah", Number(data.jumlah));
       formData.append("hpp", Number(data.hpp));
-      formData.append("kodeProduk", data.kodeProduk);
-
+      // formData.append("kodeProduk", data.kodeProduk);
       formData.append("image", image);
 
       const response = await axios.post(`${url}/api/food/add`, formData);
@@ -58,7 +57,7 @@ const Add = ({ url }) => {
           harga: "",
           kategori: "",
           hpp: "",
-          kodeProduk: "",
+          // kodeProduk: "",
         });
         setImage(false);
 
@@ -166,7 +165,7 @@ const Add = ({ url }) => {
         </div>
 
         {/* ID Produk */}
-        <div>
+        {/* <div>
           <label className="block mb-1 text-sm font-medium text-gray-700">
             ID Produk
           </label>
@@ -179,7 +178,7 @@ const Add = ({ url }) => {
             className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
             required
           />
-        </div>
+        </div> */}
 
         {/* KANAN */}
         <div className="space-y-4">
