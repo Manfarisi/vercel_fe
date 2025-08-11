@@ -20,13 +20,13 @@ const Add = ({ url }) => {
   const navigate = useNavigate();
 
   const [data, setData] = useState({
+    kodeProduk: "",
     namaProduk: "",
     keterangan: "",
     jumlah: "",
     harga: "",
     kategori: "",
     hpp: "",
-    kodeProduk: "", // Tambahkan ini
   });
 
   const onChangeHandler = (e) => {
@@ -39,8 +39,8 @@ const Add = ({ url }) => {
 
     try {
       const formData = new FormData();
-      formData.append("namaProduk", data.namaProduk);
       formData.append("kodeProduk", data.kodeProduk);
+      formData.append("namaProduk", data.namaProduk);
       formData.append("keterangan", data.keterangan);
       formData.append("harga", data.harga);
       formData.append("kategori", data.kategori);
