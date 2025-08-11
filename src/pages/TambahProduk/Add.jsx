@@ -34,18 +34,45 @@ const Add = ({ url }) => {
     setData({ ...data, [name]: value });
   };
 
+  // Fungsi format untuk display saja
+  const formatDisplayRupiah = (angka) => {
+    if (!angka) return "";
+    const numberString = angka.toString().replace(/\D/g, "");
+    return "Rp " + numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  // Fungsi untuk mendapatkan nilai numerik dari format
+  const getNumericValue = (formattedValue) => {
+    return formattedValue.replace(/\D/g, "");
+  };
+
+  // Handler khusus untuk field HPP
+  const handleHppChange = (e) => {
+    const rawValue = e.target.value.replace(/\D/g, "");
+    const newHpp = rawValue;
+    const newHarga = Math.round(newHpp * 1.2); // Hitung harga jual otomatis
+
+    setData({
+      ...data,
+      hpp: newHpp,
+      harga: newHarga.toString(),
+    });
+  };
+
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+
+    console.log("Data yang akan dikirim:", data); // Debugging
 
     try {
       const formData = new FormData();
       formData.append("kodeProduk", data.kodeProduk);
       formData.append("namaProduk", data.namaProduk);
       formData.append("keterangan", data.keterangan);
-      formData.append("harga", data.harga);
+      formData.append("harga", data.harga); // Mengirim nilai numerik, bukan yang diformat
       formData.append("kategori", data.kategori);
       formData.append("jumlah", data.jumlah);
-      formData.append("hpp", data.hpp);
+      formData.append("hpp", data.hpp); // Mengirim nilai numerik, bukan yang diformat
 
       if (image) {
         formData.append("image", image);
@@ -164,18 +191,9 @@ const Add = ({ url }) => {
             <input
               type="text"
               name="hpp"
-              placeholder="Contoh: Rp 20.000"
-              value={formatRupiah(data.hpp)}
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, "");
-                const newHpp = rawValue;
-                const newHarga = Math.round(newHpp * 1.2);
-                setData((prevData) => ({
-                  ...prevData,
-                  hpp: newHpp,
-                  harga: newHarga.toString(),
-                }));
-              }}
+              placeholder="Contoh: 20000"
+              value={formatDisplayRupiah(data.hpp)}
+              onChange={handleHppChange}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
               required
             />
@@ -191,7 +209,7 @@ const Add = ({ url }) => {
               type="text"
               name="harga"
               readOnly
-              value={formatRupiah(data.harga)}
+              value={formatDisplayRupiah(data.harga)}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
               required
             />
