@@ -15,7 +15,8 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const Add = ({ url }) => {
-  const [image, setImage] = useState(null); // Diubah dari false ke null
+  const [image, setImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk loading
   const navigate = useNavigate();
   const [data, setData] = useState({
     namaProduk: "",
@@ -27,9 +28,8 @@ const Add = ({ url }) => {
     kodeProduk: "",
   });
 
-  // Fungsi untuk mendapatkan nilai numerik dari format Rupiah
-  const getNumericValue = (formattedValue) => {
-    return formattedValue ? formattedValue.replace(/\D/g, "") : "";
+  const getNumericValue = (value) => {
+    return value ? value.toString().replace(/\D/g, "") : "0";
   };
 
   const onChangeHandler = (e) => {
@@ -39,8 +39,9 @@ const Add = ({ url }) => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
-    // Pastikan gambar ada
+    // Validasi form
     if (!image) {
       Swal.fire({
         title: "Peringatan!",
@@ -48,6 +49,18 @@ const Add = ({ url }) => {
         icon: "warning",
         confirmButtonText: "OK",
       });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!data.kodeProduk || !data.namaProduk || !data.kategori) {
+      Swal.fire({
+        title: "Peringatan!",
+        text: "Harap isi semua field yang wajib diisi",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
+      setIsSubmitting(false);
       return;
     }
 
@@ -69,23 +82,25 @@ const Add = ({ url }) => {
       });
 
       if (response.data.success) {
-        setData({
-          namaProduk: "",
-          keterangan: "",
-          jumlah: "",
-          harga: "",
-          kategori: "",
-          hpp: "",
-          kodeProduk: "",
-        });
-        setImage(null);
-
         Swal.fire({
           title: "Berhasil!",
           text: `Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}`,
           icon: "success",
           confirmButtonText: "OK",
-        }).then(() => navigate("/list"));
+        }).then(() => {
+          // Reset form
+          setData({
+            namaProduk: "",
+            keterangan: "",
+            jumlah: "",
+            harga: "",
+            kategori: "",
+            hpp: "",
+            kodeProduk: "",
+          });
+          setImage(null);
+          navigate("/list");
+        });
       }
     } catch (err) {
       console.error("Error:", err);
@@ -97,17 +112,17 @@ const Add = ({ url }) => {
         icon: "error",
         confirmButtonText: "Tutup",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Fungsi format hanya untuk display
   const formatRupiah = (angka) => {
     if (!angka) return "";
     const numberString = angka.toString().replace(/\D/g, "");
     return "Rp " + numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  // Handler khusus untuk HPP
   const handleHppChange = (e) => {
     const rawValue = e.target.value.replace(/\D/g, "");
     const newHpp = rawValue;
@@ -130,8 +145,24 @@ const Add = ({ url }) => {
         onSubmit={onSubmitHandler}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
-        {/* KIRI */}
+        {/* KOLOM KIRI */}
         <div className="space-y-4">
+          {/* ID Produk */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              ID Produk
+            </label>
+            <input
+              type="text"
+              name="kodeProduk"
+              value={data.kodeProduk}
+              onChange={onChangeHandler}
+              placeholder="Contoh: PJ-AYM-001"
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+              required
+            />
+          </div>
+
           {/* Nama Produk */}
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-700">
@@ -180,27 +211,12 @@ const Add = ({ url }) => {
               placeholder="Masukkan Jumlah"
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
+              min="1"
             />
           </div>
         </div>
 
-        {/* ID Produk */}
-        <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">
-            ID Produk
-          </label>
-          <input
-            type="text"
-            name="kodeProduk"
-            value={data.kodeProduk}
-            onChange={onChangeHandler}
-            placeholder="Contoh: PJ-AYM-001"
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-            required
-          />
-        </div>
-
-        {/* KANAN */}
+        {/* KOLOM KANAN */}
         <div className="space-y-4">
           {/* HPP */}
           <div>
@@ -228,14 +244,9 @@ const Add = ({ url }) => {
             <input
               type="text"
               name="harga"
-              placeholder="Contoh: Rp 30.000"
               readOnly
               value={formatRupiah(data.harga)}
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, "");
-                setData((prevData) => ({ ...prevData, harga: rawValue }));
-              }}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 bg-gray-100"
               required
             />
           </div>
@@ -283,17 +294,29 @@ const Add = ({ url }) => {
               onChange={(e) => setImage(e.target.files[0])}
               hidden
               required
+              accept="image/*"
             />
           </div>
         </div>
 
-        {/* Tombol Submit - Di bawah tengah */}
+        {/* Tombol Submit */}
         <div className="md:col-span-2 text-center mt-6">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
+            disabled={isSubmitting}
+            className={`inline-flex items-center gap-2 px-6 py-2 text-white rounded-md transition-all ${
+              isSubmitting
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            <FaPlus /> Tambah Produk
+            {isSubmitting ? (
+              "Memproses..."
+            ) : (
+              <>
+                <FaPlus /> Tambah Produk
+              </>
+            )}
           </button>
         </div>
       </form>
