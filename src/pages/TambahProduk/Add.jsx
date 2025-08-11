@@ -9,6 +9,7 @@ import {
   FaUtensils,
   FaImage,
   FaPlus,
+  FaBarcode,
 } from "react-icons/fa";
 import { BsFillLightningChargeFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
