@@ -25,6 +25,7 @@ const Add = ({ url }) => {
     harga: "",
     kategori: "",
     hpp: "",
+    kodeProduk: "", // Tambahkan ini
   });
 
   const onChangeHandler = (e) => {
@@ -32,46 +33,46 @@ const Add = ({ url }) => {
     setData({ ...data, [name]: value });
   };
 
-const onSubmitHandler = async (event) => {
-  event.preventDefault();
+  const onSubmitHandler = async (event) => {
+    event.preventDefault();
 
-  try {
-    const formData = new FormData();
-    formData.append("namaProduk", data.namaProduk);
-    formData.append("keterangan", data.keterangan);
-    formData.append("harga", data.harga);
-    formData.append("kategori", data.kategori);
-    formData.append("jumlah", data.jumlah);
-    formData.append("hpp", data.hpp);
+    try {
+      const formData = new FormData();
+      formData.append("namaProduk", data.namaProduk);
+      formData.append("kodeProduk", data.kodeProduk);
+      formData.append("keterangan", data.keterangan);
+      formData.append("harga", data.harga);
+      formData.append("kategori", data.kategori);
+      formData.append("jumlah", data.jumlah);
+      formData.append("hpp", data.hpp);
 
-    if (image) {
-      formData.append("image", image);
-    }
+      if (image) {
+        formData.append("image", image);
+      }
 
-    const response = await axios.post(`${url}/api/food/add`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+      const response = await axios.post(`${url}/api/food/add`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    if (response.data.success) {
+      if (response.data.success) {
+        Swal.fire({
+          title: "Berhasil!",
+          html: "Produk berhasil ditambahkan.",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => navigate("/list"));
+      }
+    } catch (err) {
+      console.error("Error:", err);
       Swal.fire({
-        title: "Berhasil!",
-        html: 'Produk berhasil ditambahkan.',
-        icon: "success",
-        confirmButtonText: "OK",
-      }).then(() => navigate("/list"));
+        title: "Error!",
+        text: err.response?.data?.message || "Terjadi kesalahan",
+        icon: "error",
+      });
     }
-  } catch (err) {
-    console.error("Error:", err);
-    Swal.fire({
-      title: "Error!",
-      text: err.response?.data?.message || "Terjadi kesalahan",
-      icon: "error",
-    });
-  }
-};
-
+  };
 
   const formatRupiah = (angka) => {
     if (!angka) return "";
@@ -216,6 +217,21 @@ const onSubmitHandler = async (event) => {
                 Hampers Neela Klappertart
               </option>
             </select>
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              <FaBarcode className="inline mr-2 text-blue-500" /> Kode Produk
+            </label>
+            <input
+              type="text"
+              name="kodeProduk"
+              value={data.kodeProduk}
+              onChange={onChangeHandler}
+              placeholder="Contoh: PJ-001"
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
           </div>
 
           {/* Upload Gambar */}
