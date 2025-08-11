@@ -57,9 +57,7 @@ const onSubmitHandler = async (event) => {
     if (response.data.success) {
       Swal.fire({
         title: "Berhasil!",
-        html: `Produk berhasil ditambahkan<br><br>
-               <strong>Nama Produk:</strong> ${response.data.data.namaProduk}<br>
-               <strong>Kategori:</strong> ${response.data.data.kategori}`,
+        html: 'Produk berhasil ditambahkan.',
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => navigate("/list"));
