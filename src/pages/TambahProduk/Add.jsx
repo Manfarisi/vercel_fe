@@ -15,8 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const Add = ({ url }) => {
-  scrollTo;
-  const [image, setImage] = useState(false);
+  const [image, setImage] = useState(null); // Diubah dari false ke null
   const navigate = useNavigate();
   const [data, setData] = useState({
     namaProduk: "",
@@ -28,26 +27,46 @@ const Add = ({ url }) => {
     kodeProduk: "",
   });
 
+  // Fungsi untuk mendapatkan nilai numerik dari format Rupiah
+  const getNumericValue = (formattedValue) => {
+    return formattedValue ? formattedValue.replace(/\D/g, "") : "";
+  };
+
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
 
-
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+
+    // Pastikan gambar ada
+    if (!image) {
+      Swal.fire({
+        title: "Peringatan!",
+        text: "Harap upload gambar produk",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("namaProduk", data.namaProduk);
       formData.append("keterangan", data.keterangan);
-      formData.append("harga", Number(data.harga));
+      formData.append("harga", getNumericValue(data.harga));
       formData.append("kategori", data.kategori);
-      formData.append("jumlah", Number(data.jumlah));
-      formData.append("hpp", Number(data.hpp));
+      formData.append("jumlah", data.jumlah);
+      formData.append("hpp", getNumericValue(data.hpp));
       formData.append("kodeProduk", data.kodeProduk);
       formData.append("image", image);
 
-      const response = await axios.post(`${url}/api/food/add`, formData);
+      const response = await axios.post(`${url}/api/food/add`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       if (response.data.success) {
         setData({
@@ -59,45 +78,46 @@ const Add = ({ url }) => {
           hpp: "",
           kodeProduk: "",
         });
-        setImage(false);
+        setImage(null);
 
         Swal.fire({
           title: "Berhasil!",
-          text: "Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}",
+          text: `Produk berhasil ditambahkan. ID Produk: ${response.data.kodeProduk}`,
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => navigate("/list"));
-      } else {
-        Swal.fire({
-          title: "Gagal!",
-          text: response.data.message || "Gagal menambahkan produk.",
-          icon: "error",
-          confirmButtonText: "Tutup",
-        });
       }
     } catch (err) {
+      console.error("Error:", err);
       Swal.fire({
         title: "Error!",
-        text: "Terjadi kesalahan saat mengirim data.",
+        text:
+          err.response?.data?.message ||
+          "Terjadi kesalahan saat mengirim data.",
         icon: "error",
         confirmButtonText: "Tutup",
       });
     }
   };
 
+  // Fungsi format hanya untuk display
   const formatRupiah = (angka) => {
     if (!angka) return "";
-    const numberString = angka.toString().replace(/[^,\d]/g, "");
-    const split = numberString.split(",");
-    const sisa = split[0].length % 3;
-    let rupiah = split[0].substr(0, sisa);
-    const ribuan = split[0].substr(sisa).match(/\d{3}/g);
-    if (ribuan) {
-      const separator = sisa ? "." : "";
-      rupiah += separator + ribuan.join(".");
-    }
-    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
-    return "Rp " + rupiah;
+    const numberString = angka.toString().replace(/\D/g, "");
+    return "Rp " + numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  // Handler khusus untuk HPP
+  const handleHppChange = (e) => {
+    const rawValue = e.target.value.replace(/\D/g, "");
+    const newHpp = rawValue;
+    const newHarga = Math.round(rawValue * 1.2);
+
+    setData({
+      ...data,
+      hpp: newHpp,
+      harga: newHarga.toString(),
+    });
   };
 
   return (
@@ -191,21 +211,9 @@ const Add = ({ url }) => {
             <input
               type="text"
               name="hpp"
-              placeholder="Contoh: Rp 20.000"
+              placeholder="Contoh: 20000"
               value={formatRupiah(data.hpp)}
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, "");
-                const newHpp = rawValue;
-
-                // Hitung harga = hpp + 20%
-                const newHarga = Math.round(newHpp * 1.2);
-
-                setData((prevData) => ({
-                  ...prevData,
-                  hpp: newHpp,
-                  harga: newHarga.toString(), // tetap disimpan sebagai string untuk formatRupiah
-                }));
-              }}
+              onChange={handleHppChange}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
               required
             />
