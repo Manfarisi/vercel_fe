@@ -48,11 +48,6 @@ const onSubmitHandler = async (event) => {
       formData.append("image", image);
     }
 
-    // Hapus pengiriman kodeProduk dari frontend
-    // if (kodeProduk) {
-    //   formData.append("kodeProduk", kodeProduk);
-    // }
-
     const response = await axios.post(
       `${url}/api/food/add`,
       formData,
@@ -66,7 +61,7 @@ const onSubmitHandler = async (event) => {
     if (response.data.success) {
       Swal.fire({
         title: "Berhasil!",
-        text: `Produk berhasil ditambahkan. ID Produk: ${response.data.data.kodeProduk}`, // Ambil dari response
+        text: 'Produk berhasil ditambahkan', // Ambil dari response
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => navigate("/list"));
