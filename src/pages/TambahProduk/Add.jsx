@@ -31,7 +31,7 @@ const Add = ({ url }) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
-  
+
 const onSubmitHandler = async (event) => {
   event.preventDefault();
 
@@ -39,57 +39,38 @@ const onSubmitHandler = async (event) => {
     const formData = new FormData();
     formData.append("namaProduk", data.namaProduk);
     formData.append("keterangan", data.keterangan);
-    formData.append("harga", Number(data.harga));
+    formData.append("harga", data.harga);
     formData.append("kategori", data.kategori);
-    formData.append("jumlah", Number(data.jumlah));
-    formData.append("hpp", Number(data.hpp));
+    formData.append("jumlah", data.jumlah);
+    formData.append("hpp", data.hpp);
 
     if (image) {
       formData.append("image", image);
     }
 
-    const response = await axios.post(
-      `${url}/api/food/add`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axios.post(`${url}/api/food/add`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     if (response.data.success) {
       Swal.fire({
         title: "Berhasil!",
-        text: `Produk berhasil ditambahkan${response.data.data?.kodeProduk ? ` dengan kode: ${response.data.data.kodeProduk}` : ''}`,
+        html: `Produk berhasil ditambahkan<br><br>
+               <strong>Kode Produk:</strong> ${response.data.data.kodeProduk}<br>
+               <strong>Nama Produk:</strong> ${response.data.data.namaProduk}<br>
+               <strong>Kategori:</strong> ${response.data.data.kategori}`,
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => navigate("/list"));
-
-      setData({
-        namaProduk: "",
-        keterangan: "",
-        jumlah: "",
-        harga: "",
-        kategori: "",
-        hpp: "",
-      });
-      setImage(null);
-    } else {
-      Swal.fire({
-        title: "Gagal!",
-        text: response.data.message || "Gagal menambahkan produk.",
-        icon: "error",
-        confirmButtonText: "Tutup",
-      });
     }
   } catch (err) {
-    console.error("Error saat kirim data:", err);
+    console.error("Error:", err);
     Swal.fire({
       title: "Error!",
-      text: err.response?.data?.message || "Terjadi kesalahan saat mengirim data.",
+      text: err.response?.data?.message || "Terjadi kesalahan",
       icon: "error",
-      confirmButtonText: "Tutup",
     });
   }
 };
