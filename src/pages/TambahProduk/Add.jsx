@@ -31,7 +31,7 @@ const Add = ({ url }) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
-
+  
 const onSubmitHandler = async (event) => {
   event.preventDefault();
 
@@ -61,7 +61,7 @@ const onSubmitHandler = async (event) => {
     if (response.data.success) {
       Swal.fire({
         title: "Berhasil!",
-        text: 'Produk berhasil ditambahkan', // Ambil dari response
+        text: `Produk berhasil ditambahkan${response.data.data?.kodeProduk ? ` dengan kode: ${response.data.data.kodeProduk}` : ''}`,
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => navigate("/list"));
@@ -87,7 +87,7 @@ const onSubmitHandler = async (event) => {
     console.error("Error saat kirim data:", err);
     Swal.fire({
       title: "Error!",
-      text: "Terjadi kesalahan saat mengirim data.",
+      text: err.response?.data?.message || "Terjadi kesalahan saat mengirim data.",
       icon: "error",
       confirmButtonText: "Tutup",
     });
